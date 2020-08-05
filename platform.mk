@@ -16,7 +16,8 @@
 PLATFORM_COMMON_PATH := device/sony/ganges
 
 SOMC_PLATFORM := ganges
-SOMC_KERNEL_VERSION := 4.14
+SOMC_KERNEL_VERSION := mainline
+KERNEL_PATH := kernel/$(SOMC_KERNEL_VERSION)
 
 $(call inherit-product, device/sony/common/common.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
@@ -123,17 +124,48 @@ PRODUCT_PACKAGES += \
     init.ganges.pwr \
     ueventd
 
-# Audio
+# Audio     sound_trigger.primary.sdm660 \
 PRODUCT_PACKAGES += \
-    sound_trigger.primary.sdm660 \
     audio.primary.sdm660
 
 # GFX
 PRODUCT_PACKAGES += \
-    copybit.sdm660 \
-    gralloc.sdm660 \
-    hwcomposer.sdm660 \
-    memtrack.sdm660
+    android.hardware.graphics.mapper@2.0-service \
+    gralloc.gbm \
+    hwcomposer.drm \
+    libGLES_mesa \
+
+# gallium_dri provides the necessary msm_dri.so (which is a symlink)
+# TODO: Figure out how to build libexpat and libstdc++ onto vendor
+PRODUCT_PACKAGES += \
+    gallium_dri \
+
+    #libexpat \
+    #libstdc++
+
+PRODUCT_PACKAGES += memtrack.default \
+    android.hardware.memtrack@1.0-service \
+    android.hardware.memtrack@1.0-impl
+
+# PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+#     hal.gralloc=drm \
+#     debug.egl.hw=1 \
+#     ro.opengles.version=196608
+#
+
+# Hack around post-fs wait_for_prop
+PRODUCT_PROPERTY_OVERRIDES += \
+    vendor.sys.listeners.registered=true
+    
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.hardware.gralloc=gbm \
+    ro.hardware.hwcomposer=drm \
+#     debug.sf.no_hw_vsync=1 \
+#     hwc.drm.use_framebuffer_target=1 \
+#     hwc.drm.use_overlay_planes=0 \
+#     ro.sf.lcd_density=160 \
+#     ro.opengles.version=196608 \
+#     persist.demo.rotationlock=1
 
 # GPS
 PRODUCT_PACKAGES += \
@@ -232,6 +264,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 #WiFi MAC address path
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.vendor.wifi.addr_path=/data/vendor/wifi/wlan_mac.bin
+    
+# Default keymaster service provides "insuecure" software implementation:
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@4.0-service
 
 # setup dm-verity configs.
 PRODUCT_SYSTEM_VERITY_PARTITION := /dev/block/platform/soc/c0c4000.sdhci/by-name/system

@@ -13,6 +13,12 @@
 # limitations under the License.
 
 # Platform path
+
+OARD_GPU_DRIVERS := freedreno virgl
+BOARD_USES_DRM_HWCOMPOSER := true
+
+TARGET_USES_HWC2 := true
+
 PLATFORM_COMMON_PATH := device/sony/ganges
 PRODUCT_PLATFORM_SOD := true
 
@@ -37,6 +43,7 @@ BOARD_RAMDISK_OFFSET     := 0x02000000
 
 BOARD_KERNEL_CMDLINE += lpm_levels.sleep_disabled=1
 BOARD_KERNEL_CMDLINE += service_locator.enable=1
+BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
 
 # Serial console
 #BOARD_KERNEL_CMDLINE += earlycon=msm_serial_dm,0xc170000
@@ -91,7 +98,7 @@ BOARD_SUPPORTS_SOUND_TRIGGER := true
 TARGET_NEEDS_AUDIOPD := true
 
 # Display
-TARGET_USES_GRALLOC1 := true
+#TARGET_USES_GRALLOC1 := true
 TARGET_USES_SDE := true
 TARGET_RECOVERY_PIXEL_FORMAT := BGRA_8888
 TARGET_USES_DRM_PP := true
